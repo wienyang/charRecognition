@@ -5,7 +5,7 @@
 using namespace std;
 using namespace cv;
 using namespace dnn;
-#define SHOW
+//#define SHOW
 
 
 MRZ::MRZ(const cv::Mat & img, int type)
@@ -48,7 +48,7 @@ int MRZ::segmentChars()
 	threshold(imgBin, imgBin, 0, 255, THRESH_BINARY | THRESH_OTSU);
 	imgBin = imgBin == 0;
 	imgBin(Rect(0, 0, 30, img.rows)) = 0;*/
-
+	//@wenyang2020 0720
 	int horizontalKernalWidth = 0;
 	if (m_type == 0)
 		horizontalKernalWidth = 25;//50
@@ -58,12 +58,13 @@ int MRZ::segmentChars()
 		horizontalKernalWidth = 50;//100
 
 	Mat horizontalShort = getStructuringElement(MORPH_RECT, Size(horizontalKernalWidth, 1));
-	Mat verticalKernel = getStructuringElement(MORPH_RECT, Size(1, 2));//5
+	//@wenyang2020 0720
+	Mat verticalKernel = getStructuringElement(MORPH_RECT, Size(1, 2));//5 
 
 	Mat blackhat;
 	morphologyEx(img, blackhat, MORPH_BLACKHAT, horizontalShort);
-
-	blackhat(Rect(0, 0, 30, img.rows)) = 0;
+	//@wenyang2020 0720
+	blackhat(Rect(0, 0, 20, img.rows)) = 0;//30
 
 #ifdef SHOW
 	namedWindow("blackhat", 0);
@@ -75,7 +76,8 @@ int MRZ::segmentChars()
 	Mat imgBin = blackhat.clone();
 	threshold(imgBin, imgBin, 0, 255, THRESH_BINARY | THRESH_OTSU);
 	//imgBin = imgBin == 0;
-	imgBin(Rect(0, 0, 30, img.rows)) = 0;//30
+	//@wenyang2020 0720
+	imgBin(Rect(0, 0, 20, img.rows)) = 0;//30
 
 #ifdef SHOW
 	namedWindow("imgBin", 0);
@@ -115,7 +117,8 @@ int MRZ::segmentChars()
 		gradX.at<uchar>(i, 0) = 0;
 		gradX.at<uchar>(i, gradX.cols - 1) = 0;
 	}
-	gradX(Rect(0, 0, 30, img.rows)) = 0;
+	//@wenyang2020 0720
+	gradX(Rect(0, 0, 20, img.rows)) = 0;
 	auto tmpKernal = getStructuringElement(MORPH_RECT, Size(10, 1));
 	morphologyEx(gradX, gradX, MORPH_OPEN, tmpKernal);
 
@@ -329,7 +332,7 @@ void MRZ::checkMrzStr()
 		}
 	}
 	else if (m_type == 2)
-	{
+	{	
 		if (m_mrzStr.size() != 93)
 		{
 			//LOG(WARNING) << "type2 mrz size not equal to 93";
@@ -338,22 +341,71 @@ void MRZ::checkMrzStr()
 		string line1Str = m_mrzStr.substr(0, 31);
 		string line2Str = m_mrzStr.substr(31, 31);
 		string line3Str = m_mrzStr.substr(62, 31);
-		//*********第一行********
-		for (int i = 0; i < 2; ++i)
-			num2alpha(line1Str[i]);
-		for (int i = 3; i < 22; ++i)
-			alpha2num(line1Str[i]);
-		num2alpha(line1Str[22]);
-		for (int i = 23; i < 30; ++i)
-			alpha2num(line1Str[i]);
-		//*********第二行********
-		for (int i = 0; i < 20; ++i)
-			num2alpha(line2Str[i]);
-		for (int i = 20; i < 30; ++i)
-			alpha2num(line2Str[i]);
-		//*********第三行********
-		for (char c : line3Str)
-			num2alpha(c);
+		//@wenyang 20200720
+		//lujianxiao
+		////*********第一行********
+		//for (int i = 0; i < 2; ++i)
+		//	num2alpha(line1Str[i]);
+		//for (int i = 3; i < 22; ++i)
+		//	alpha2num(line1Str[i]);
+		//num2alpha(line1Str[22]);
+		//for (int i = 23; i < 30; ++i)
+		//	alpha2num(line1Str[i]);
+		////*********第二行********
+		//for (int i = 0; i < 20; ++i)
+		//	num2alpha(line2Str[i]);
+		//for (int i = 20; i < 30; ++i)
+		//	alpha2num(line2Str[i]);
+		////*********第三行********
+		//for (char c : line3Str)
+		//	num2alpha(c);
+		if (line1Str.substr(0, 2) == "CT") {//台湾居民往来大陆通行证
+			//*********第一行********
+			//for (int i = 0; i < 2; ++i)
+			//	num2alpha(line1Str[i]);
+			for (int i = 2; i < 22; ++i)
+				alpha2num(line1Str[i]);
+			num2alpha(line1Str[22]);
+			for (int i = 23; i < 30; ++i)
+				alpha2num(line1Str[i]);
+			//*********第二行********
+			for (int i = 0; i < 20; ++i)
+				num2alpha(line2Str[i]);
+			for (int i = 20; i < 30; ++i)
+				alpha2num(line2Str[i]);
+			//*********第三行********//拉丁姓名+4签发机关代码（英文或数字）
+			for (char c : line3Str)//有待优化
+				num2alpha(c);
+		}else if (line1Str.substr(0, 2) == "CR") {//2012新版回乡证（港澳居民往来大陆）
+			//*********第一行********
+			//for (int i = 0; i < 3; ++i)//CR+H/M(香港/澳门)
+			//	num2alpha(line1Str[i]);
+			for (int i = 3; i < 22; ++i)
+				alpha2num(line1Str[i]);
+			//num2alpha(line1Str[22]);// M/F性别
+			for (int i = 23; i < 30; ++i)
+				alpha2num(line1Str[i]);
+			//*********第二行********
+			for (int i = 0; i < 19; ++i)//姓名、弃字数、世纪数
+				num2alpha(line2Str[i]);
+			//证件号码（香港：（双）字母+6位数字+数字/A 澳门：八位数字)
+			if (line1Str[2] == 'H') {//香港
+				num2alpha(line2Str[19]);//首位字母
+				for (int i = 21; i < 26;i++) {//五位数字
+					alpha2num(line2Str[i]);
+				}
+			}else {//澳门
+				for (int i = 19; i < 27; i++) {
+					alpha2num(line2Str[i]);//八位数字
+				}
+			}
+			for (int i = 28; i < 30; ++i)
+				alpha2num(line2Str[i]);
+			//*********第三行********
+			for (char c : line3Str)
+				num2alpha(c);
+		}
+		
 		//*********合并**********
 		m_mrzStr.clear();
 		m_mrzStr += line1Str;

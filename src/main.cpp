@@ -52,7 +52,7 @@ int main(int argc, char* argv[])
 	//const char* io = argv[4];
 
 	int type = 2;
-	//const char* imgDir = "F:\\hahaha\\backup\\2020-01\\重要数据\\护照img\\type0";
+	//const char* imgDir = "F:\\hahaha\\backup\\2020-01\\重要数据\\护照img\\type2";
 	//const char* imgDir = "C:\\Users\\admin\\Desktop\\mrz32\\type2";
 	const char* imgDir = "C:\\Users\\admin\\Desktop\\errorImg\\HX";
 	const char* modelPath = "F:/hahaha/backup/2020-01/ocr/charRecognition/models/mrz32_61.pb";

@@ -113,9 +113,9 @@ cv::Mat findMrz(const cv::Mat & img, int type)
 	if (img.empty())
 		return {};
 	Mat imgCopy = img.clone();
-	//resize(imgCopy, imgCopy, Size(1140, 822));//2280,1645
-	if(type!=2)resize(imgCopy, imgCopy, Size(1140, 822));//2280,1645
-	else resize(imgCopy, imgCopy, Size(1140, 720));//2280,1645
+	resize(imgCopy, imgCopy, Size(1140, 822));//2280,1645
+	//if(type!=2)resize(imgCopy, imgCopy, Size(1140, 822));//2280,1645
+	//else resize(imgCopy, imgCopy, Size(1140, 720));//2280,1645
 
 	if (type == 0 || type == -1)	
 		imgCopy = imgCopy(Rect(0, imgCopy.rows * 3 / 4, imgCopy.cols, imgCopy.rows - imgCopy.rows * 3 / 4));
