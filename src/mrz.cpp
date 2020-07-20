@@ -51,14 +51,14 @@ int MRZ::segmentChars()
 
 	int horizontalKernalWidth = 0;
 	if (m_type == 0)
-		horizontalKernalWidth = 50;//50
+		horizontalKernalWidth = 25;//50
 	else if (m_type == 1)
-		horizontalKernalWidth = 75;
+		horizontalKernalWidth = 35;//75
 	else if (m_type == 2)
-		horizontalKernalWidth = 100;
+		horizontalKernalWidth = 50;//100
 
 	Mat horizontalShort = getStructuringElement(MORPH_RECT, Size(horizontalKernalWidth, 1));
-	Mat verticalKernel = getStructuringElement(MORPH_RECT, Size(1, 5));//5
+	Mat verticalKernel = getStructuringElement(MORPH_RECT, Size(1, 2));//5
 
 	Mat blackhat;
 	morphologyEx(img, blackhat, MORPH_BLACKHAT, horizontalShort);
@@ -75,7 +75,7 @@ int MRZ::segmentChars()
 	Mat imgBin = blackhat.clone();
 	threshold(imgBin, imgBin, 0, 255, THRESH_BINARY | THRESH_OTSU);
 	//imgBin = imgBin == 0;
-	imgBin(Rect(0, 0, 30, img.rows)) = 0;
+	imgBin(Rect(0, 0, 30, img.rows)) = 0;//30
 
 #ifdef SHOW
 	namedWindow("imgBin", 0);
@@ -142,17 +142,17 @@ int MRZ::segmentChars()
 		rect.width += 40;
 		rect.x = max(0, rect.x);
 		rect.width = min(img.cols - 1 - rect.x, rect.width);
-
+		//2020 0720@wenyang
 		if (m_type == 0) {
-			if (rect.width > img.cols * 4 / 5 && rect.height >= 25 && rect.height <= 150)
+			if (rect.width > img.cols * 4 / 5 && rect.height >= 12 && rect.height <= 80)//25,150
 				rects.push_back(rect);
 		}
 		else if (m_type == 1) {
-			if (rect.width > img.cols * 4 / 5 && rect.height >= 25 && rect.height <= 150)
+			if (rect.width > img.cols * 4 / 5 && rect.height >= 12 && rect.height <= 80)//25,150
 				rects.push_back(rect);
 		}
 		else if (m_type == 2) {
-			if (rect.width > img.cols * 4 / 5 && rect.height >= 50 && rect.height <= 150)
+			if (rect.width > img.cols * 4 / 5 && rect.height >= 25 && rect.height <= 80)//50,150
 				rects.push_back(rect);
 		}
 	}
